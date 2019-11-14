@@ -1,4 +1,4 @@
-import {TaskType} from "../types/TaskType";
+import { TaskType } from "../types/TaskType";
 
 const ANT_NUMBER = 2;
 
@@ -11,16 +11,16 @@ export class TaskService {
     const antCreationTasksSize = activeTasks[TaskType.CREATE_ANT].length;
 
     let antsBeingCreated = 0;
-    for(let spawnName in Game.spawns) {
-      const spawn = Game.spawns[spawnName];
-      if(spawn.memory.activeTask && spawn.memory.activeTask.type == TaskType.CREATE_ANT) {
+    for (const anthillId of roomMemory.entities.anthills) {
+      const anthill: StructureSpawn = Game.getObjectById(anthillId) as StructureSpawn;
+      if (anthill.memory.activeTask && anthill.memory.activeTask.type === TaskType.CREATE_ANT) {
         ++antsBeingCreated;
       }
     }
 
     const neededAnts = ANT_NUMBER - (antCreationTasksSize + roomMemory.entities.ants.length + antsBeingCreated);
 
-    if(neededAnts > 0) {
+    if (neededAnts > 0) {
       for(let i = 0;i < neededAnts;i++) {
         const task: Task = {
           type: TaskType.CREATE_ANT
@@ -28,6 +28,34 @@ export class TaskService {
 
         activeTasks[TaskType.CREATE_ANT].push(
           task
+        );
+      }
+    }
+
+    const gatherEnergyTasksSize = activeTasks[TaskType.COMPOUND].length;
+    if (gatherEnergyTasksSize < roomMemory.entities.energySources.length) {
+      for (const energySourceId of roomMemory.entities.energySources) {
+        const goToTask: GoToTask = {
+          destinationId: energySourceId,
+          type: TaskType.GO_TO
+        };
+
+        const gatherTask: HarvestTask = {
+          sourceId: energySourceId,
+          amount: 50,
+          type: TaskType.HARVEST
+        };
+
+        const compoundTask: CompoundTask = {
+          subtasks: [
+            goToTask,
+            gatherTask
+          ],
+          type: TaskType.COMPOUND
+        };
+
+        activeTasks[TaskType.COMPOUND].push(
+          compoundTask
         );
       }
     }
@@ -40,16 +68,37 @@ export class TaskService {
 
     const antCreationTasks = activeTasks[TaskType.CREATE_ANT];
 
-    for(let spawnId of roomMemory.entities.anthills) {
-      const spawn: StructureSpawn = <StructureSpawn>Game.getObjectById(spawnId);
+    for (const spawnId of roomMemory.entities.anthills) {
+      const spawn: StructureSpawn = Game.getObjectById(spawnId) as StructureSpawn;
 
-      if(spawn.spawning != null || spawn.memory.activeTask != undefined) {
+      if (spawn.spawning || spawn.memory.activeTask) {
         continue;
       }
-      const task = antCreationTasks.pop();
+      const task = antCreationTasks.shift();
 
       if(task) {
         spawn.memory.activeTask = task;
+      } else {
+        break;
+      }
+    }
+
+    const gatherEnergyTasks = activeTasks[TaskType.COMPOUND];
+    for (const antId of roomMemory.entities.ants) {
+      const ant: Creep = Game.getObjectById(antId) as Creep;
+
+      if (ant.memory.activeTask) {
+        continue;
+      }
+
+      if(ant.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+        continue;
+      }
+
+      const task = gatherEnergyTasks.shift();
+
+      if (task) {
+        ant.memory.activeTask = task;
       } else {
         break;
       }

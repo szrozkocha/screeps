@@ -1,8 +1,9 @@
-import { ErrorMapper } from "utils/ErrorMapper";
-import {TaskService} from "./service/TaskService";
-import {MemoryService} from "./service/MemoryService";
-import {Init} from "./utils/Init";
 import {Anthill} from "./entity/Anthill";
+import {MemoryService} from "./service/MemoryService";
+import {TaskService} from "./service/TaskService";
+import {ErrorMapper} from "./utils/ErrorMapper";
+import {Init} from "./utils/Init";
+import { Ant } from "./entity/Ant";
 
 Init.init();
 
@@ -14,6 +15,10 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
   for (const anthillName in Game.spawns) {
     Anthill.tick(anthillName);
+  }
+
+  for (const antName in Game.creeps) {
+    Ant.tick(antName);
   }
 
   MemoryService.clean();

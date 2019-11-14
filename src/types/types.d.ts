@@ -1,4 +1,6 @@
-interface CreepMemory { [name: string]: any; }
+interface CreepMemory {
+  activeTask?: Task;
+}
 interface FlagMemory { [name: string]: any; }
 
 interface SpawnMemory {
@@ -9,6 +11,7 @@ interface SpawnMemory {
 interface RoomEntities {
   anthills: string[];
   ants: string[];
+  energySources: string[];
 }
 
 interface RoomMemory {
