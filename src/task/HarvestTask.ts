@@ -16,8 +16,7 @@ export class HarvestTask extends Task {
     if(ant.store.getUsedCapacity(RESOURCE_ENERGY) < task.amount) {
       const source: Source | Mineral = Game.getObjectById(task.sourceId) as Source | Mineral;
 
-      ant.harvest(source);
-      return false;
+      return ant.harvest(source) !== 0;
     } else {
       return true;
     }

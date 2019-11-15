@@ -7,7 +7,7 @@ import { TaskTag } from "../task/TaskTag";
 import { TransferTask } from "../task/TransferTask";
 import { UpgradeControllerTask } from "../task/UpgradeControllerTask";
 
-const ANT_NUMBER = 8;
+const ANT_NUMBER = 16;
 
 export class TaskService {
   public static createRoomTask(roomName: string) {
