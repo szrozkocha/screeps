@@ -1,12 +1,14 @@
 import { Task } from "./Task";
 import { TaskType } from "./TaskType";
 import { Anthill, AnthillState } from "../entity/Anthill";
+import { TaskTag } from "./TaskTag";
 
 export class CreateAntTask extends Task {
   constructor(
-    timeout: number
+    timeout: number,
+    tags?: TaskTag[]
   ) {
-    super(TaskType.CREATE_ANT, timeout);
+    super(TaskType.CREATE_ANT, timeout, tags);
   }
 
   public static run(anthill: StructureSpawn): boolean {

@@ -1,13 +1,15 @@
 import { Task } from "./Task";
 import { TaskType } from "./TaskType";
+import { TaskTag } from "./TaskTag";
 
 export class HarvestTask extends Task {
   constructor(
     public sourceId: string,
     public amount: number,
-    timeout: number
+    timeout: number,
+    tags?: TaskTag[]
   ) {
-    super(TaskType.HARVEST, timeout);
+    super(TaskType.HARVEST, timeout, tags);
   }
 
   public static run(task: HarvestTask, ant: Creep): boolean {

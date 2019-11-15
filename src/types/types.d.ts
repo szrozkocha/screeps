@@ -33,6 +33,10 @@ interface Creep {
   store: Store;
 }
 
+interface PowerCreep {
+  store: Store;
+}
+
 interface StructureExtension {
   store: Store;
 }

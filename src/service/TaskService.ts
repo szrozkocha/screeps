@@ -3,8 +3,11 @@ import { CreateAntTask } from "../task/CreateAntTask";
 import { GoToTask } from "../task/GoToTask";
 import { CompoundTask } from "../task/CompoundTask";
 import { HarvestTask } from "../task/HarvestTask";
+import { TaskTag } from "../task/TaskTag";
+import { TransferTask } from "../task/TransferTask";
+import { UpgradeControllerTask } from "../task/UpgradeControllerTask";
 
-const ANT_NUMBER = 2;
+const ANT_NUMBER = 8;
 
 export class TaskService {
   public static createRoomTask(roomName: string) {
@@ -14,10 +17,39 @@ export class TaskService {
 
     const antCreationTasksSize = activeTasks[TaskType.CREATE_ANT].length;
     let antsBeingCreated = 0;
-    for (const anthillId of roomMemory.entities.anthills) {
-      const anthill: StructureSpawn = Game.getObjectById(anthillId) as StructureSpawn;
-      if (anthill.memory.activeTask && anthill.memory.activeTask.type === TaskType.CREATE_ANT) {
-        ++antsBeingCreated;
+    for(const {} of roomMemory.entities.ants) {
+      for (const anthillId of roomMemory.entities.anthills) {
+        const anthill: StructureSpawn = Game.getObjectById(anthillId) as StructureSpawn;
+        if (anthill.memory.activeTask && anthill.memory.activeTask.type === TaskType.CREATE_ANT) {
+          ++antsBeingCreated;
+        }
+
+        if (anthill.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+
+          activeTasks[TaskType.COMPOUND].push(
+            new CompoundTask(
+              [
+                new GoToTask(anthillId, Number.MAX_VALUE),
+                new TransferTask(anthillId, 50)
+              ],
+              1,
+              [TaskTag.FULL_ANT]
+            )
+          );
+        } else {
+          const controller = Game.rooms[roomName].controller as StructureController;
+
+          activeTasks[TaskType.COMPOUND].push(
+            new CompoundTask(
+              [
+                new GoToTask(controller.id, Number.MAX_VALUE),
+                new UpgradeControllerTask(controller.id, 50)
+              ],
+              1,
+              [TaskTag.FULL_ANT]
+            )
+          );
+        }
       }
     }
 
@@ -29,16 +61,21 @@ export class TaskService {
       }
     }
 
-    for (const energySourceId of roomMemory.entities.energySources) {
-      activeTasks[TaskType.COMPOUND].push(
-        new CompoundTask(
-          [
-            new GoToTask(energySourceId, Number.MAX_VALUE),
-            new HarvestTask(energySourceId, 50, Number.MAX_VALUE)
-          ],
-          1
-        )
-      );
+    const harvestTasks = activeTasks[TaskType.COMPOUND].filter(task => (task.tags) ? task.tags.find(tag => tag === TaskTag.EMPTY_ANT) !== undefined : false).length;
+
+    if(harvestTasks < roomMemory.entities.energySources.length) {
+      for (const energySourceId of roomMemory.entities.energySources) {
+        activeTasks[TaskType.COMPOUND].push(
+          new CompoundTask(
+            [
+              new GoToTask(energySourceId, Number.MAX_VALUE),
+              new HarvestTask(energySourceId, 50, Number.MAX_VALUE)
+            ],
+            5,
+            [TaskTag.EMPTY_ANT]
+          )
+        );
+      }
     }
   }
 
@@ -64,7 +101,7 @@ export class TaskService {
       }
     }
 
-    const gatherEnergyTasks = activeTasks[TaskType.COMPOUND];
+    const compound: CompoundTask[] = activeTasks[TaskType.COMPOUND] as CompoundTask[];
     for (const antId of roomMemory.entities.ants) {
       const ant: Creep = Game.getObjectById(antId) as Creep;
 
@@ -73,15 +110,17 @@ export class TaskService {
       }
 
       if(ant.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-        continue;
-      }
+        const task = compound.find(task => (task.tags) ? task.tags.find(tag => tag === TaskTag.FULL_ANT) !== undefined : false);
 
-      const task = gatherEnergyTasks.shift();
-
-      if (task) {
-        ant.memory.activeTask = task;
+        if(task) {
+          ant.memory.activeTask = task;
+        }
       } else {
-        break;
+        const task = compound.find(task => (task.tags) ? task.tags.find(tag => tag === TaskTag.EMPTY_ANT) !== undefined : false);
+
+        if(task) {
+          ant.memory.activeTask = task;
+        }
       }
     }
   }

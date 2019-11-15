@@ -16,7 +16,7 @@ export class Anthill {
       return;
     }
 
-    const ended = TaskRunner.run(anthill, anthill.memory.activeTask);
+    const ended = TaskRunner.runAnthill(anthill, anthill.memory.activeTask);
 
     if(ended) {
       anthill.memory.spawningAntName = undefined;

@@ -13,7 +13,7 @@ export class Ant {
       return;
     }
 
-    const ended = TaskRunner.run(ant, ant.memory.activeTask);
+    const ended = TaskRunner.runAnt(ant, ant.memory.activeTask);
 
     if(ended) {
       ant.memory.activeTask = undefined;

@@ -1,12 +1,14 @@
 import { Task } from "./Task";
 import { TaskType } from "./TaskType";
+import { TaskTag } from "./TaskTag";
 
 export class GoToTask extends Task {
   constructor(
     public destinationId: string,
-    timeout: number
+    timeout: number,
+    tags?: TaskTag[]
   ) {
-    super(TaskType.GO_TO, timeout);
+    super(TaskType.GO_TO, timeout, tags);
   }
 
   public static run(task: GoToTask, ant: Creep): boolean {
