@@ -1,6 +1,6 @@
-import { TaskType } from "../types/TaskType";
+import { TaskRunner } from "../task/TaskRunner";
 
-enum AnthillState {
+export enum AnthillState {
   FREE = "🚬",
   BUSY = "⚙",
   UNABLE = "⛔",
@@ -9,43 +9,22 @@ enum AnthillState {
 
 export class Anthill {
   public static tick(name: string): void {
-    const spawn = Game.spawns[name];
+    const anthill = Game.spawns[name];
 
-    if (!spawn.memory.activeTask) {
-      Anthill.say(name, AnthillState.FREE);
+    if (!anthill.memory.activeTask) {
+      Anthill.say(anthill, AnthillState.FREE);
       return;
     }
 
-    if (spawn.spawning) {
-      Anthill.say(name, AnthillState.BUSY);
-      return;
-    }
+    const ended = TaskRunner.run(anthill, anthill.memory.activeTask);
 
-    if (spawn.memory.activeTask.type === TaskType.CREATE_ANT) {
-      if(!spawn.memory.spawningAntName) {
-        if(spawn.store.getUsedCapacity(RESOURCE_ENERGY) < 250) {
-          Anthill.say(name, AnthillState.UNABLE);
-          return;
-        }
-        const antName = "Ant_" + Date.now();
-        Anthill.say(name, AnthillState.BUSY);
-        spawn.spawnCreep([WORK, CARRY, MOVE, MOVE], antName);
-        spawn.memory.spawningAntName = antName;
-      } else {
-        Anthill.say(name, AnthillState.BUSY);
-        const ants = Memory.rooms[spawn.room.name].entities.ants;
-        ants[ants.length] = Game.creeps[spawn.memory.spawningAntName].id;// Because fucking push don't work, that's why
-
-        spawn.memory.spawningAntName = undefined;
-        spawn.memory.activeTask = undefined;
-      }
-    } else {
-      Anthill.say(name, AnthillState.ERROR);
+    if(ended) {
+      anthill.memory.spawningAntName = undefined;
+      anthill.memory.activeTask = undefined;
     }
   }
 
-  private static say(name: string, message: string): void {
-    const spawn = Game.spawns[name];
-    spawn.room.visual.text(message, spawn.pos.x + 1, spawn.pos.y, {align: 'left', opacity: 0.8});
+  public static say(anthill: StructureSpawn, message: string): void {
+    anthill.room.visual.text(message, anthill.pos.x + 1, anthill.pos.y, {align: 'left', opacity: 0.8});
   }
 }

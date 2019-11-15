@@ -5,19 +5,7 @@ declare enum TaskType {
   HARVEST = 3
 }
 
-interface Task {
+declare interface Task {
   type: TaskType;
-}
-
-interface GoToTask extends Task {
-  destinationId: string;
-}
-
-interface CompoundTask extends Task {
-  subtasks: Task[];
-}
-
-interface HarvestTask extends Task {
-  sourceId: string;
-  amount: number;
+  timeout: number;
 }

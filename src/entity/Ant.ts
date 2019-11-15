@@ -1,4 +1,4 @@
-import { TaskType } from "../types/TaskType";
+import { TaskRunner } from "../task/TaskRunner";
 
 enum AntState {
   FREE = "🚬",
@@ -13,37 +13,10 @@ export class Ant {
       return;
     }
 
-    if(ant.memory.activeTask.type === TaskType.COMPOUND) {
-      const compoundTask: CompoundTask = ant.memory.activeTask as CompoundTask;
+    const ended = TaskRunner.run(ant, ant.memory.activeTask);
 
-      if(compoundTask.subtasks.length === 0) {
-        ant.memory.activeTask = undefined;
-      } else {
-        const subtask = compoundTask.subtasks[0];
-
-        if (subtask.type === TaskType.GO_TO) {
-          const task: GoToTask = subtask as GoToTask;
-          const destination: RoomPosition | { pos: RoomPosition } = Game.getObjectById(task.destinationId) as RoomPosition | { pos: RoomPosition };
-
-          const distance = ant.pos.getRangeTo(destination);
-
-          if(distance > 1) {
-            ant.moveTo(destination, {visualizePathStyle: {stroke: '#ffaa00'}});
-          } else {
-            compoundTask.subtasks.shift();
-          }
-        } else if(subtask.type === TaskType.HARVEST) {
-          const task: HarvestTask = subtask as HarvestTask;
-
-          if(ant.store.getUsedCapacity(RESOURCE_ENERGY) < task.amount) {
-            const source: Source | Mineral = Game.getObjectById(task.sourceId) as Source | Mineral;
-
-            ant.harvest(source);
-          } else {
-            compoundTask.subtasks.shift();
-          }
-        }
-      }
+    if(ended) {
+      ant.memory.activeTask = undefined;
     }
   }
 

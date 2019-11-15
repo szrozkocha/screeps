@@ -21,5 +21,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
     Ant.tick(antName);
   }
 
+  for (const roomName in Memory.rooms) {
+    TaskService.validateTasks(roomName);
+  }
+
   MemoryService.clean();
 });

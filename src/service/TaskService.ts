@@ -1,4 +1,8 @@
-import { TaskType } from "../types/TaskType";
+import { TaskType } from "../task/TaskType";
+import { CreateAntTask } from "../task/CreateAntTask";
+import { GoToTask } from "../task/GoToTask";
+import { CompoundTask } from "../task/CompoundTask";
+import { HarvestTask } from "../task/HarvestTask";
 
 const ANT_NUMBER = 2;
 
@@ -9,7 +13,6 @@ export class TaskService {
     const activeTasks = roomMemory.activeTasks;
 
     const antCreationTasksSize = activeTasks[TaskType.CREATE_ANT].length;
-
     let antsBeingCreated = 0;
     for (const anthillId of roomMemory.entities.anthills) {
       const anthill: StructureSpawn = Game.getObjectById(anthillId) as StructureSpawn;
@@ -22,42 +25,20 @@ export class TaskService {
 
     if (neededAnts > 0) {
       for(let i = 0;i < neededAnts;i++) {
-        const task: Task = {
-          type: TaskType.CREATE_ANT
-        };
-
-        activeTasks[TaskType.CREATE_ANT].push(
-          task
-        );
+        activeTasks[TaskType.CREATE_ANT].push(new CreateAntTask(Number.MAX_VALUE));
       }
     }
 
-    const gatherEnergyTasksSize = activeTasks[TaskType.COMPOUND].length;
-    if (gatherEnergyTasksSize < roomMemory.entities.energySources.length) {
-      for (const energySourceId of roomMemory.entities.energySources) {
-        const goToTask: GoToTask = {
-          destinationId: energySourceId,
-          type: TaskType.GO_TO
-        };
-
-        const gatherTask: HarvestTask = {
-          sourceId: energySourceId,
-          amount: 50,
-          type: TaskType.HARVEST
-        };
-
-        const compoundTask: CompoundTask = {
-          subtasks: [
-            goToTask,
-            gatherTask
+    for (const energySourceId of roomMemory.entities.energySources) {
+      activeTasks[TaskType.COMPOUND].push(
+        new CompoundTask(
+          [
+            new GoToTask(energySourceId, Number.MAX_VALUE),
+            new HarvestTask(energySourceId, 50, Number.MAX_VALUE)
           ],
-          type: TaskType.COMPOUND
-        };
-
-        activeTasks[TaskType.COMPOUND].push(
-          compoundTask
-        );
-      }
+          1
+        )
+      );
     }
   }
 
@@ -102,6 +83,19 @@ export class TaskService {
       } else {
         break;
       }
+    }
+  }
+
+  public static validateTasks(roomName: string): void {
+    const roomMemory = Memory.rooms[roomName];
+
+    const activeTasks = roomMemory.activeTasks;
+
+    for(const type in activeTasks) {
+      activeTasks[type] = activeTasks[type].map(task => {
+        --task.timeout;
+        return task;
+      }).filter(task => task.timeout > 0);
     }
   }
 }
