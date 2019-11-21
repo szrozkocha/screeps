@@ -1,7 +1,10 @@
 interface CreepMemory {
   activeTask?: Task;
+  bondedSourceId?: Id<Source>;
 }
-interface FlagMemory { [name: string]: any; }
+interface FlagMemory {
+  [name: string]: any;
+}
 
 interface SpawnMemory {
   activeTask?: Task;
@@ -9,48 +12,22 @@ interface SpawnMemory {
 }
 
 interface RoomEntities {
-  anthills: string[];
-  ants: string[];
-  energySources: string[];
+  anthills: Id<StructureSpawn>[];
+  ants: { id: Id<Creep>; name: string }[];
+  energySources: { [id: string]: SourceMemory };
+}
+
+interface SourceMemory {
+  accessPositions: { x: number; y: number }[];
+  bondedAnts: Id<Creep>[];
+  lostEnergy: number;
 }
 
 interface RoomMemory {
-  activeTasks: {[name: number]: Task[]};
+  activeTasks: { [name: number]: Task[] };
   entities: RoomEntities;
 }
 
 interface Memory {
   initialized: boolean;
-}
-
-interface Store {
-  getCapacity(resource?: string): number;
-  getFreeCapacity(resource?: string): number;
-  getUsedCapacity(resource?: string): number;
-}
-
-interface Creep {
-  store: Store;
-}
-
-interface PowerCreep {
-  store: Store;
-}
-
-interface StructureExtension {
-  store: Store;
-}
-
-interface StructureSpawn {
-  store: Store;
-}
-
-interface StructureTower {
-  store: Store;
-}
-
-declare namespace NodeJS {
-  interface Global {
-    log: any;
-  }
 }
