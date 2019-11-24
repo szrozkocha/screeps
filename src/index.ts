@@ -3,7 +3,10 @@ import TaskService from './service/TaskService';
 import Init from './utils/Init';
 import Ant from './entity/Ant';
 import EnergySource from './entity/EnergySource';
-import Controller from "./entity/Controller";
+import Controller from './entity/Controller';
+import RoadPlanerService from './service/RoadPlanerService';
+import BuildPlanerService from './service/BuildPlanerService';
+import ExtensionPlanerService from './service/ExtensionPlanerService';
 
 Init.init();
 
@@ -27,6 +30,9 @@ export const loop = (): void => {
       EnergySource.tick(energySourceId, roomMemory);
     }
 
+    RoadPlanerService.planRoads(roomName);
+    BuildPlanerService.createBuildConstructionSiteTasks(roomName);
+    ExtensionPlanerService.planExtensions(roomName);
     Controller.tick(Game.rooms[roomName].controller);
   }
 };

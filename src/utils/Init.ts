@@ -23,6 +23,10 @@ export default class Init {
           anthills: anthills.map(spawn => spawn.id),
           ants: [],
           energySources: Init.initSources(room.find(FIND_SOURCES)),
+          constructionSites: [],
+        },
+        roadPlaner: {
+          visitedCount: {},
         },
       };
     }

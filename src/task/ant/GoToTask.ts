@@ -1,6 +1,7 @@
 import Task from '../Task';
 import TaskType from '../TaskType';
 import TaskTag from '../TaskTag';
+import RoadPlanerService from '../../service/RoadPlanerService';
 
 export default class GoToTask extends Task {
   constructor(
@@ -20,8 +21,10 @@ export default class GoToTask extends Task {
 
     const distance = ant.pos.getRangeTo(destination);
 
+    RoadPlanerService.addVisitedPlace(ant.pos);
     if (distance > task.proximity) {
       ant.moveTo(destination, { visualizePathStyle: { stroke: '#ffaa00' } });
+
       return false;
     }
     return true;

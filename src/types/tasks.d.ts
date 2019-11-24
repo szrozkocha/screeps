@@ -5,6 +5,7 @@ declare enum TaskType {
   HARVEST = 3,
   TRANSFER = 4,
   UPGRADE_CONTROLLER = 5,
+  BUILD = 6,
 }
 
 declare enum TaskTag {

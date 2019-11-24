@@ -108,7 +108,7 @@ declare const OBSTACLE_OBJECT_TYPES: [
   'terminal',
   'nuker',
   'factory',
-  'invaderCore',
+  'invaderCore'
 ];
 
 declare const ENERGY_REGEN_TIME: 300;

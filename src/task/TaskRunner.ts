@@ -6,6 +6,7 @@ import CompoundTask from './CompoundTask';
 import HarvestTask from './ant/HarvestTask';
 import TransferTask from './ant/TransferTask';
 import UpgradeControllerTask from './ant/UpgradeControllerTask';
+import BuildTask from "./ant/BuildTask";
 
 export default class TaskRunner {
   public static runAnthill(target: StructureSpawn, task: Task): boolean {
@@ -31,6 +32,8 @@ export default class TaskRunner {
         return TransferTask.run(task as TransferTask, target);
       case TaskType.UPGRADE_CONTROLLER:
         return UpgradeControllerTask.run(task as UpgradeControllerTask, target);
+      case TaskType.BUILD:
+        return BuildTask.run(task as BuildTask, target);
       default:
         return false;
     }

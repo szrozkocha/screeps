@@ -28,17 +28,14 @@ export default class EnergySource {
     }
 
     if (sourceMemory.bondedAnts.length < sourceMemory.accessPositions.length) {
-      roomMemory.activeTasks[TaskType.CREATE_ANT].push(new CreateAntTask(1, id));
+      roomMemory.activeTasks[TaskType.CREATE_ANT].push(new CreateAntTask(1, id, [WORK, CARRY, CARRY, MOVE, MOVE]));
     }
 
     if (source.energy > 0) {
       roomMemory.activeTasks[TaskType.COMPOUND].push(
-        new CompoundTask(
-          [new GoToTask(id, Number.MAX_VALUE, id), new HarvestTask(id, 50, Number.MAX_VALUE, id)],
-          1,
-          id,
-          [TaskTag.EMPTY_ANT],
-        ),
+        new CompoundTask([new GoToTask(id, Number.MAX_VALUE, id), new HarvestTask(id, Number.MAX_VALUE, id)], 1, id, [
+          TaskTag.EMPTY_ANT,
+        ]),
       );
     }
   }
