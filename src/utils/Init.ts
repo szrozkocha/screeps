@@ -10,6 +10,8 @@ export default class Init {
       const room = Game.rooms[roomName];
       const anthills = room.find(FIND_MY_SPAWNS);
 
+      Memory.rooms = {};
+
       Memory.rooms[roomName] = {
         activeTasks: {
           0: [],

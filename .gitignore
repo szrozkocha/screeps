@@ -69,3 +69,4 @@ screeps.json
 
 #IntelliJ
 *.iml
+.idea
