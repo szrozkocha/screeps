@@ -30,7 +30,6 @@ export default class CreateAntTask extends Task {
 
     if (!anthill.memory.spawningAntName) {
       const usedCapacity: number = anthill.store.getUsedCapacity(RESOURCE_ENERGY);
-      console.log(task.cost);
       if (usedCapacity < task.cost) {
         Anthill.say(anthill, AnthillState.UNABLE);
         return false;
